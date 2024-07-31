@@ -1,4 +1,4 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 
 const productSchema = new mongoose.Schema({
   title: {
@@ -10,17 +10,36 @@ const productSchema = new mongoose.Schema({
     required: true
   },
   images: {
-    type: [],
-    required: true
+    type: []
   },
   stock: {
-    type: Number,
+    type: String,
     required: true
   },
   price: {
-    type: Number,
+    type: String,
     required: true
+  },
+  seller: {
+    type: Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+  reviews: {
+    type: Schema.Types.ObjectId,
+    ref: "Review"
+  },
+  rating: {
+    type: Number,
+    min: 1,
+    max: 5
   }
-})
+},
+  {
+    timestamps: {
+      createdAt,
+      updatedAt
+    }
+  })
 
-export const Product = mongoose.model('Product', orderSchema)
+export const Product = mongoose.model('Product', productSchema)

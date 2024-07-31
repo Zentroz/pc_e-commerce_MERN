@@ -1,10 +1,19 @@
-import mongoose from 'mongoose'
+import mongoose, { Schema } from 'mongoose'
 import bcrypt from 'bcrypt'
 
 const userSchema = new mongoose.Schema({
-  username: {
+  userName: {
     type: String,
-    required: true
+    required: true,
+    lowercase: true
+  },
+  firstName: {
+    type: String,
+    required: true,
+  },
+  lastName: {
+    type: String,
+    required: true,
   },
   email: {
     type: String,
@@ -23,13 +32,28 @@ const userSchema = new mongoose.Schema({
     type: Boolean,
     required: true
   },
-  purchased_items: {
-    type: []
+  purchases: {
+    type: Schema.Types.ObjectId,
+    ref: "Order"
   },
-  listed_items: {
-    type: []
+  productsListed: {
+    type: Schema.Types.ObjectId,
+    ref: "Product"
+  },
+  productsInCart: {
+    type: Schema.Types.ObjectId,
+    ref: "Product"
+  },
+  refreshToken: {
+    type: String
   }
-})
+},
+  {
+    timestamps: {
+      createdAt,
+      updatedAt
+    }
+  })
 
 userSchema.pre("save", async function (next) {
   if (this.isModified("password")) return next();
@@ -42,4 +66,4 @@ userSchema.method.isPassowrdCorrect = async function (password) {
   return await bcrypt.compare(passowrd, this.passowrd)
 }
 
-export const User = mongoose.model('User', orderSchema)
+export const User = mongoose.model('User', userSchema)
