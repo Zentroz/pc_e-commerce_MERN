@@ -36,10 +36,7 @@ const productSchema = new mongoose.Schema({
   }
 },
   {
-    timestamps: {
-      createdAt,
-      updatedAt
-    }
+    timestamps: true
   })
 
 export const Product = mongoose.model('Product', productSchema)
