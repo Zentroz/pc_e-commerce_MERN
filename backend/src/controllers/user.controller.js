@@ -2,7 +2,7 @@ import asyncHandler from '../utils/asyncHandler.js'
 import ApiError from '../utils/apiError.js'
 import ApiResponse from '../utils/apiResponse.js'
 import { User } from '../models/user.model.js'
-import jwt from 'jsonwebtoken'
+import options from '../utils/options.js'
 
 const generateAccessRefreshToken = async function (id) {
   try {
@@ -60,9 +60,8 @@ const registerUser = asyncHandler(async (req, res) => {
 const loginUser = asyncHandler(async (req, res) => {
   const { email, password } = req.body
 
-  if ([email, password].some((field) => {
-    field.trim() == ""
-  })) {
+  if (!email || !password) {
+    console.log(email, password)
     throw new ApiError(400, "All fields are required!")
   }
 
@@ -74,11 +73,11 @@ const loginUser = asyncHandler(async (req, res) => {
     throw new ApiError(406, isPassowrdCorrect)
   }
 
-  const { accessToken, refreshToken } = generateAccessRefreshToken(user._id)
+  const { accessToken, refreshToken } = await generateAccessRefreshToken(user._id)
 
   const loggedInUser = await User.findById(user._id).select("-password -refreshToken")
 
-  res.status(200).cookie("accesstoken", accessToken).cookie("refreshtoken", refreshToken).json(new ApiResponse(200, loggedInUser, "Logged in successfully"))
+  res.status(200).cookie("accesstoken", accessToken, options).cookie("refreshtoken", refreshToken, options).json(new ApiResponse(200, loggedInUser, "Logged in successfully"))
 })
 
 export {
