@@ -96,39 +96,8 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"))
 })
 
-const addProduct = asyncHandler(async (req, res) => {
-  // required to create product - title, description, stock, price, seller
-
-  const seller = req.user
-  const { title, description, stock, price } = req.body
-
-  if (!title || !description || !stock || !price) {
-    throw new ApiError(400, "All fields are required")
-  }
-
-  const imagePaths = req.files.map((file) => file.path)
-
-  const product = await Product.create({
-    title,
-    description,
-    seller: seller._id,
-    images: imagePaths,
-    stock,
-    price
-  })
-
-  if (!product) {
-    throw new ApiError(500, "Failed to create product")
-  }
-
-  const createdProduct = await Product.findById(product._id)
-
-  res.status(200).json(new ApiResponse(200, createdProduct, "Product successfully added"))
-})
-
 export {
   registerUser,
   loginUser,
   logoutUser,
-  addProduct
 }
