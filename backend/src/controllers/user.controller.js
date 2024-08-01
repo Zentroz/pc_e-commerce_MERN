@@ -3,6 +3,7 @@ import ApiError from '../utils/apiError.js'
 import ApiResponse from '../utils/apiResponse.js'
 import { User } from '../models/user.model.js'
 import options from '../utils/options.js'
+import { Product } from '../models/product.model.js'
 
 const generateAccessRefreshToken = async function (id) {
   try {
@@ -80,7 +81,54 @@ const loginUser = asyncHandler(async (req, res) => {
   res.status(200).cookie("accesstoken", accessToken, options).cookie("refreshtoken", refreshToken, options).json(new ApiResponse(200, loggedInUser, "Logged in successfully"))
 })
 
+const logoutUser = asyncHandler(async (req, res) => {
+  await User.findOneAndUpdate(req.user._id, {
+    $unset: {
+      refreshToken: 1
+    }
+  }, {
+    new: true
+  })
+
+  res.status(200)
+    .clearCookie("accesstoken", options)
+    .clearCookie("refreshtoken", options)
+    .json(new ApiResponse(200, {}, "User logged out successfully"))
+})
+
+const addProduct = asyncHandler(async (req, res) => {
+  // required to create product - title, description, stock, price, seller
+
+  const seller = req.user
+  const { title, description, stock, price } = req.body
+
+  if (!title || !description || !stock || !price) {
+    throw new ApiError(400, "All fields are required")
+  }
+
+  const imagePaths = req.files.map((file) => file.path)
+
+  const product = await Product.create({
+    title,
+    description,
+    seller: seller._id,
+    images: imagePaths,
+    stock,
+    price
+  })
+
+  if (!product) {
+    throw new ApiError(500, "Failed to create product")
+  }
+
+  const createdProduct = await Product.findById(product._id)
+
+  res.status(200).json(new ApiResponse(200, createdProduct, "Product successfully added"))
+})
+
 export {
   registerUser,
   loginUser,
+  logoutUser,
+  addProduct
 }
