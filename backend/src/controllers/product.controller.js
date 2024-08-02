@@ -106,48 +106,15 @@ const addProduct = asyncHandler(async (req, res) => {
 })
 
 const removeProduct = asyncHandler(async (req, res) => {
-  const { userName, title } = req.body
+  const { title } = req.body
 
-  const product = await Product.aggregate([
-    {
-      $match: {
-        title
-      }
-    },
-    {
-      $lookup: {
-        from: "users",
-        localField: "seller",
-        foreignField: "_id",
-        as: "seller",
-        pipeline: [
-          {
-            $match: {
-              userName
-            }
-          },
-          {
-            $project: {
-              userName: 1
-            }
-          }
-        ]
-      }
-    },
-    {
-      $addFields: {
-        seller: {
-          $first: "$seller"
-        }
-      }
-    }
-  ])
+  const product = Product.findOne({ title })
 
   if (!product) {
-    throw new ApiError(500, "Failed to find product from database")
+    throw new ApiError(500, `Couldn't find product with title: ${title}`)
   }
 
-  const deletedProduct = await Product.findByIdAndDelete(product[0]._id)
+  const deletedProduct = await Product.findByIdAndDelete(product._id)
 
   if (!deletedProduct) {
     throw new ApiError(500, "Failed to delete product")
@@ -156,9 +123,30 @@ const removeProduct = asyncHandler(async (req, res) => {
   res.status(200).json(new ApiResponse(200, {}, "Product deleted successfully"))
 })
 
+const editProduct = asyncHandler(async (req, res) => {
+  const { title, sellerName, newTitle, newDescription, newPrice, newStock } = req.body
+
+  const product = await Product.findOne({ title })
+
+  if (!product) {
+    throw new ApiError(400, `Couldn't find product with the title ${title}`)
+  }
+
+  await product.updateProductDetails(newTitle, newDescription, newPrice, newStock).then(async (data) => {
+    const updatedProduct = await product.findProductWithSellerName(data.title, sellerName)
+
+    if (!product) {
+      throw new ApiError(500, "Couldn't find updated prduct")
+    }
+
+    res.status(200).json(new ApiResponse(200, updatedProduct, "Product updated successfully"))
+  })
+})
+
 export {
   addProduct,
   removeProduct,
+  editProduct
 }
 
 

@@ -9,8 +9,12 @@ const orderSchema = new mongoose.Schema({
     type: String,
     required: true
   },
+  deliveryCharge: {
+    type: Number,
+    required: true
+  },
   discount: {
-    type: String
+    type: Number
   },
   transactionId: {
     type: String,
