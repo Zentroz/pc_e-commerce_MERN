@@ -28,13 +28,8 @@ const productSchema = new mongoose.Schema({
     required: true
   },
   reviews: {
-    type: Schema.Types.ObjectId,
+    type: [Schema.Types.ObjectId],
     ref: "Review"
-  },
-  rating: {
-    type: Number,
-    min: 1,
-    max: 5
   }
 },
   {

@@ -96,8 +96,38 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"))
 })
 
+const updateUser = asyncHandler(async (req, res) => {
+  const { userName, firstName, lastName, email, password, address } = req.body
+
+  const user = await User.findById(req.user._id.toString())
+
+  if (!user) {
+    throw new ApiError(400, `Couldn't find user with username: ${userName}`)
+  }
+
+  await user.updateUserDetails(userName, firstName, lastName, email, password, address).then((updatedUser) => {
+    console.log(updatedUser)
+    res.status(200).json(new ApiResponse(200, updatedUser, "User updated successfully"))
+  })
+})
+
+const deleteUser = asyncHandler(async (req, res) => {
+
+  await Product.deleteMany({ seller: req.user._id })
+
+  const user = await User.findByIdAndDelete(req.user._id.toString())
+
+  if (!user) {
+    throw new ApiError(500, "Couldn't find user")
+  }
+
+  res.status(200).clearCookie("accesstoken").clearCookie("refreshToken").json(new ApiResponse(200, {}, "User deleted succesfully"))
+})
+
 export {
   registerUser,
   loginUser,
   logoutUser,
+  updateUser,
+  deleteUser
 }

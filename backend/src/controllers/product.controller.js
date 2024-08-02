@@ -124,7 +124,9 @@ const removeProduct = asyncHandler(async (req, res) => {
 })
 
 const editProduct = asyncHandler(async (req, res) => {
-  const { title, sellerName, newTitle, newDescription, newPrice, newStock } = req.body
+  const { title, newTitle, newDescription, newPrice, newStock } = req.body
+
+  const sellerName = req.user.userName
 
   const product = await Product.findOne({ title })
 
