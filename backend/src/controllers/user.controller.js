@@ -96,6 +96,16 @@ const logoutUser = asyncHandler(async (req, res) => {
     .json(new ApiResponse(200, {}, "User logged out successfully"))
 })
 
+const getUserDetails = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id).select("-password -refreshToken")
+
+  if (!user) {
+    throw new ApiError(400, "User not found")
+  }
+
+  res.status(200).json(new ApiResponse(200, user, "User fetched successfully"))
+})
+
 const updateUser = asyncHandler(async (req, res) => {
   const { userName, firstName, lastName, email, password, address } = req.body
 
@@ -127,6 +137,7 @@ const deleteUser = asyncHandler(async (req, res) => {
 export {
   registerUser,
   loginUser,
+  getUserDetails,
   logoutUser,
   updateUser,
   deleteUser

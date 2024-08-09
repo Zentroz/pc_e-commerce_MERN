@@ -30,6 +30,10 @@ const productSchema = new mongoose.Schema({
   reviews: {
     type: [Schema.Types.ObjectId],
     ref: "Review"
+  },
+  category: {
+    type: String,
+    required: true
   }
 },
   {
