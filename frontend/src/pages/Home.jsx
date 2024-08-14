@@ -1,13 +1,11 @@
 import React from 'react'
-import Navbar from '../components/Navbar'
-import banner1 from '../../public/img/temp_banner1.png'
-import rtx from '../../public/img/rtx4080-dual.webp'
+import banner1 from '../img/temp_banner1.png'
+import rtx from '../img/rtx4080-dual.webp'
 import ProductCard from '../components/ProductCard'
 
 const Home = () => {
   return (
     <div>
-      <Navbar />
       <div className='featured-banner w-screen h-96 my-5'>
         <img className='size-full' src={banner1} alt='featured-image' />
       </div>
